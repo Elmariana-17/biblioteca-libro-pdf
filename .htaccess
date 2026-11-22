@@ -1,0 +1,2 @@
+# This is a Node.js application. Apache must not expose its private files.
+Require all denied

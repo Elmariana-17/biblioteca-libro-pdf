@@ -1,0 +1,10 @@
+const CACHE='entre-paginas-v2-shell-4';const ASSETS='entre-paginas-v2-assets';
+const CORE=['/','/index.html','/app.js','/releases.js','/theme.js','/offline.js','/epub.js','/style.css','/favicon.svg','/manifest.webmanifest','/assets/companions.png','/assets/icon-192.png','/assets/icon-512.png','/vendor/pdf.mjs','/vendor/pdf.worker.mjs','/vendor/purify.mjs','/vendor/fflate.mjs'];
+self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())));
+self.addEventListener('activate',event=>event.waitUntil((async()=>{for(const name of await caches.keys())if(name.startsWith('entre-paginas-')&&![CACHE,ASSETS].includes(name))await caches.delete(name);await self.clients.claim();})()));
+self.addEventListener('fetch',event=>{const u=new URL(event.request.url);if(u.origin!==location.origin||event.request.method!=='GET'||u.pathname.startsWith('/api/'))return;
+ if(event.request.mode==='navigate'){event.respondWith(fetch(event.request).catch(()=>caches.match('/index.html')));return;}
+ if(CORE.includes(u.pathname)||u.pathname.startsWith('/vendor/'))event.respondWith((async()=>{try{const response=await fetch(event.request);if(response.ok){const c=await caches.open(u.pathname.startsWith('/vendor/')?ASSETS:CACHE);await c.put(event.request,response.clone());}return response;}catch{return await caches.match(event.request)||Response.error();}})());
+});
+self.addEventListener('push',event=>event.waitUntil((async()=>{let data={};try{data=event.data?.json()||{};}catch{}await self.registration.showNotification(data.title||'Entre páginas',{body:data.body||'Hay una historia nueva para ti.',icon:'/assets/icon-192.png',badge:'/assets/icon-192.png',tag:data.tag||'publication',data:{url:typeof data.url==='string'&&/^\/\?book=[\w-]+$/.test(data.url)?data.url:'/'}});})()));
+self.addEventListener('notificationclick',event=>{event.notification.close();event.waitUntil(self.clients.openWindow(new URL(event.notification.data?.url||'/',self.location.origin).href));});

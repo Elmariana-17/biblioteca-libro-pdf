@@ -1,0 +1,25 @@
+{
+  "name": "entre-paginas",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.16.0"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.mjs",
+    "dev": "node --watch --env-file-if-exists=.env server.mjs",
+    "setup": "node --env-file-if-exists=.env scripts/setup.mjs",
+    "test": "node --test",
+    "passwords:reset": "node --env-file-if-exists=.env scripts/setup.mjs --reset",
+    "backup": "node --env-file-if-exists=.env scripts/backup.mjs",
+    "restore": "node --env-file-if-exists=.env scripts/restore.mjs",
+    "import": "node --env-file-if-exists=.env scripts/import-book.mjs"
+  },
+  "dependencies": {
+    "dompurify": "^3.4.18",
+    "fflate": "^0.8.3",
+    "pdfjs-dist": "^6.5.438",
+    "web-push": "^4.0.0"
+  }
+}
